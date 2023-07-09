@@ -135,7 +135,7 @@ public:
     int VfCred_I(MPK &mpk,ISK &isk, IPK &ipk, ICRED &icred);
     int UKeyGen(Big &id,USK &usk,UPK &upk, UTK &utk,PI_2 &pi_2);
     int Issue_U(ISK &isk, IPK &ipk,ICRED &icred,UPK &upk, Big &id, ATTR &attr, UTK &utk,PI_2 &pi_2,UCRED &ucred,IPK &ipk_,ICRED &icred_);
-    int VfCred_U(IPK &ipk_,USK &usk, UPK &upk, ATTR &attr, UCRED &ucred);
+    int VfCred_U(MPK &mpk,IPK &ipk_, ICRED &icred_,USK &usk, UPK &upk, ATTR &attr, UCRED &ucred);
     int Show(MPK &mpk,IPK &ipk_, ICRED &icred_,USK &usk, UPK &upk, ATTR &attr, UCRED &ucred, Big &CTX,DISCLOSE &D,TOKEN &tk);
     int Verify(MPK &mpk,Big &CTX,DISCLOSE &D,TOKEN &tk);
     int Trace(TOKEN &tk,Big &id);

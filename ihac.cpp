@@ -240,9 +240,23 @@ int IHAC::Issue_U(ISK &isk, IPK &ipk, ICRED &icred, UPK &upk, Big &id, ATTR &att
     list_reg.count++;
     return ret;
 }
-int IHAC::VfCred_U(IPK &ipk_, USK &usk, UPK &upk, ATTR &attr, UCRED &ucred)
+int IHAC::VfCred_U(MPK &mpk,IPK &ipk_, ICRED &icred_,USK &usk, UPK &upk, ATTR &attr, UCRED &ucred)
 {
     int ret =0;
+    //
+    GT e1,e2;
+    e1=pfc->pairing(g_,g);
+    e1=pfc->power(e1,0);
+    for(int j=0;j<ATTRIBUTES_NUM;j++)
+    {
+        e1=e1*pfc->pairing(ipk_.X_[0][j],mpk.Y[0][j]);
+        e1=e1*pfc->pairing(ipk_.X_[1][j],mpk.Y[1][j]);
+    }
+    e2=pfc->pairing(icred_.A_,icred_.B);
+    if(e1 != e2) return -1;
+    e1=pfc->pairing(icred_.B_,g);
+    e2=pfc->pairing(g_,icred_.B);
+    if(e1 != e2) return -2;
     //verify TAM-sign
 
     for(int i=0;i<ATTRIBUTES_NUM;i++)

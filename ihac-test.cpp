@@ -2,7 +2,7 @@
 #include "pairing_3.h"
 #include <ctime>
 #include <time.h>
-#define TEST_TIME 5
+#define TEST_TIME 1
 
 int correct_test()
 {
@@ -87,7 +87,7 @@ int correct_test()
     else
         printf("ihac.Issue_U pass\n");
     //VfCred_U
-    ret = ihac.VfCred_U(ipk_,usk, upk, attr, ucred);
+    ret = ihac.VfCred_U(mpk,ipk_,icred_,usk, upk, attr, ucred);
     if(ret != 0)
     {
         printf("ihac.VfCred_U Erro ret =%d\n",ret);
@@ -139,13 +139,74 @@ int correct_test()
 }
 int speed_test()
 {
-    int i;
+    int i,k;
     clock_t start,finish;
     double sum;
     PFC pfc(AES_SECURITY);
 
     IHAC ihac(&pfc);
     int ret =0;
+
+    //1. basic
+    //G1
+    start=clock();
+    for(k=0;k<TEST_TIME;k++)
+    {
+        G1 G;
+        pfc.random(G);
+        Big r;
+        pfc.random(r);
+        G1 T=pfc.mult(G,r);
+    }
+    finish=clock();
+    sum = (double)(finish-start)/(CLOCKS_PER_SEC*TEST_TIME);
+    printf("BN256.e_1 ret : %d time =%f sec\n",ret,sum);
+
+    //G2
+    start=clock();
+    for(k=0;k<TEST_TIME;k++)
+    {
+        G2 G;
+        pfc.random(G);
+        Big r;
+        pfc.random(r);
+        G2 T=pfc.mult(G,r);
+    }
+    finish=clock();
+    sum = (double)(finish-start)/(CLOCKS_PER_SEC*TEST_TIME);
+    printf("BN256.e_2 ret : %d time =%f sec\n",ret,sum);
+
+    //GT
+    G1 T;
+    G2 G;
+    pfc.random(G);
+    pfc.random(T);
+    GT E=pfc.pairing(G,T);
+
+    start=clock();
+    for(k=0;k<TEST_TIME;k++)
+    {
+        Big r;
+        pfc.random(r);
+        E=pfc.power(E,r);
+    }
+    finish=clock();
+    sum = (double)(finish-start)/(CLOCKS_PER_SEC*TEST_TIME);
+    printf("BN256.e_T ret : %d time =%f sec\n",ret,sum);
+
+    //e
+    start=clock();
+    for(k=0;k<TEST_TIME;k++)
+    {
+        G1 G;
+        G2 H;
+        pfc.random(G);
+        pfc.random(H);
+        GT T=pfc.pairing(H,G);
+    }
+    finish=clock();
+    sum = (double)(finish-start)/(CLOCKS_PER_SEC*TEST_TIME);
+    printf("BN256.e_p ret : %d time =%f sec\n",ret,sum);
     //1 SetUP
     MSK msk;
     MPK mpk;
@@ -256,7 +317,7 @@ int speed_test()
     start=clock();
     for(i=0;i<TEST_TIME;i++)
     {
-        ret = ihac.VfCred_U(ipk_,usk, upk, attr, ucred);
+        ret = ihac.VfCred_U(mpk,ipk_,icred_,usk, upk, attr, ucred);
         if(ret != 0)
         {
             printf("ihac.VfCred_U Erro ret =%d\n",ret);
@@ -297,7 +358,7 @@ int speed_test()
     }
     finish=clock();
     sum = (double)(finish-start)/CLOCKS_PER_SEC;
-    printf("ihac.Verify ret : %d time =%f sec\n",ret,sum);
+    printf("ihac.Verify ret : %d time =%f sec\n",ret,sum/TEST_TIME);
     Big tid;
     start=clock();
     for(i=0;i<TEST_TIME;i++)
